@@ -1,0 +1,78 @@
+name: Build Image
+on:
+  schedule:
+    - cron: '0 3 */2 * *'
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: leptos
+  IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
+  MAJOR_VERSION: 10
+  DEFAULT_TAG: ${{ github.ref_name }}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_push:
+    name: Build and push image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Get date
+        id: date
+        run: |
+            echo "tag=$(date -u +%Y%m%d)" >> "$GITHUB_OUTPUT"
+            echo "created=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+
+      - name: GHCR Login
+        uses: redhat-actions/podman-login@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build, Rechunk, and Push
+        id: build
+        uses: jharmison-redhat/action-bootc-build@v1.0.3
+        with:
+          tag: "${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}"
+          labels: |
+            org.opencontainers.image.created=${{ steps.date.outputs.created }}
+            org.opencontainers.image.title=${{ env.IMAGE_NAME }}
+            org.opencontainers.image.url=https://github.com/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+            org.opencontainers.image.version=${{ env.MAJOR_VERSION }}.${{ steps.date.outputs.tag }}
+            containers.bootc=1
+          push: true
+
+      - name: Add date-specific tag and get digest
+        run: |
+          IMAGE_FULL="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}"
+          DATE_TAG="${{ env.DEFAULT_TAG }}.${{ steps.date.outputs.tag }}"
+
+          sudo podman tag "${{ steps.build.outputs.tag }}" "$IMAGE_FULL:${{ env.DEFAULT_TAG }}"
+          sudo podman push "$IMAGE_FULL:${{ env.DEFAULT_TAG }}"
+          IMAGE_DIGEST=$(sudo podman inspect --format '{{.Digest}}' "$IMAGE_FULL:${{ env.DEFAULT_TAG }}")
+
+          sudo podman tag "${{ steps.build.outputs.tag }}" "$IMAGE_FULL:$DATE_TAG"
+          sudo podman push "$IMAGE_FULL:$DATE_TAG"
+
+          echo "IMAGE_FULL=$IMAGE_FULL" >> $GITHUB_ENV
+          echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> $GITHUB_ENV
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.10.0
+
+      - name: Sign image by digest
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
+        run: |
+          cosign sign --yes "$IMAGE_FULL@$IMAGE_DIGEST"
