@@ -41,6 +41,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check for updates
+        if: ${{ github.event_name == 'schedule' }}  # Only run if triggered by schedule
         run: |
           upd=0
           sudo podman run --quiet --rm ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DEFAULT_TAG }} dnf check-update || upd=$?
@@ -49,13 +50,13 @@ jobs:
           echo "Exit code from dnf check-update: '${upd}'"
 
       - name: Exit if no updates found
-        if: ${{ env.upd == 0 && github.event_name != 'workflow_dispatch' }}
+        if: ${{ github.event_name == 'schedule' && env.upd == 0 }}
         run: |
           echo "No updates found. Exiting.."
           exit 0
 
       - name: Build, Rechunk, and Push
-        if: ${{ env.upd == 0 && github.event_name != 'workflow_dispatch' }}
+        if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
         id: build
         uses: jharmison-redhat/action-bootc-build@v1.0.3
         with:
@@ -69,7 +70,7 @@ jobs:
           push: true
 
       - name: Add date-specific tag and get digest
-        if: ${{ env.upd == 0 && github.event_name != 'workflow_dispatch' }}
+        if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
         run: |
           IMAGE_FULL="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}"
           DATE_TAG="${{ env.DEFAULT_TAG }}.${{ steps.date.outputs.tag }}"
@@ -85,11 +86,11 @@ jobs:
           echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> $GITHUB_ENV
 
       - name: Install Cosign
-        if: ${{ env.upd == 0 && github.event_name != 'workflow_dispatch' }}
+        if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
         uses: sigstore/cosign-installer@v3.10.0
 
       - name: Sign image by digest
-        if: ${{ env.upd == 0 && github.event_name != 'workflow_dispatch' }}
+        if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
         run: |
