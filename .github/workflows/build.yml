@@ -49,12 +49,6 @@ jobs:
           echo "upd=${upd}" >> "$GITHUB_ENV"
           echo "Exit code from dnf check-update: '${upd}'"
 
-      - name: Exit if no updates found
-        if: ${{ github.event_name == 'schedule' && env.upd == 0 }}
-        run: |
-          echo "No updates found. Exiting.."
-          exit 0
-
       - name: Build, Rechunk, and Push
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
         id: build
