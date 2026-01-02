@@ -8,8 +8,7 @@ dnf -y install --setopt=install_weak_deps=False \
     libvirt-client \
     libvirt-daemon-kvm \
     virt-install \
-    virt-viewer \
-    virt-manager
+    virt-viewer
 
 # GUI
 dnf -y install virt-manager
