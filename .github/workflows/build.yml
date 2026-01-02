@@ -6,7 +6,7 @@ on:
 
 env:
   IMAGE_NAME: leptos
-  IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
+  IMAGE_FULL: ghcr.io/${{ github.repository }}
   MAJOR_VERSION: 10
   DEFAULT_TAG: ${{ github.ref_name }}
 
@@ -27,10 +27,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Get date
+      - name: Set date tag
         id: date
         run: |
-            echo "tag=$(date -u +%Y%m%d)" >> "$GITHUB_OUTPUT"
+            echo "DATE_TAG=${DEFAULT_TAG}.$(date -u +%Y%m%d)" >> "$GITHUB_ENV"
 
       - name: GHCR Login
         uses: redhat-actions/podman-login@v1
@@ -43,7 +43,7 @@ jobs:
         if: ${{ github.event_name == 'schedule' }}  # Only run if triggered by schedule
         run: |
           upd=0
-          sudo podman run --quiet --rm ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DEFAULT_TAG }} dnf check-update || upd=$?
+          sudo podman run --quiet --rm ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }} dnf check-update || upd=$?
 
           echo "upd=${upd}" >> "$GITHUB_ENV"
           echo "Exit code from dnf check-update: '${upd}'"
@@ -53,28 +53,21 @@ jobs:
         id: build
         uses: jharmison-redhat/action-bootc-build@v1.0.3
         with:
-          tag: "${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}"
+          tag: "${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}"
           labels: |
             org.opencontainers.image.title=${{ env.IMAGE_NAME }}
-            org.opencontainers.image.version=${{ env.MAJOR_VERSION }}.${{ steps.date.outputs.tag }}
+            org.opencontainers.image.version=${{ env.MAJOR_VERSION }}.${{ env.DATE_TAG }}
             containers.bootc=1
           push: true
 
       - name: Add date-specific tag and get digest
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
         run: |
-          IMAGE_FULL="${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}"
-          DATE_TAG="${{ env.DEFAULT_TAG }}.${{ steps.date.outputs.tag }}"
-
-          sudo podman tag "${{ steps.build.outputs.tag }}" "$IMAGE_FULL:${{ env.DEFAULT_TAG }}"
-          sudo podman push "$IMAGE_FULL:${{ env.DEFAULT_TAG }}"
-          IMAGE_DIGEST=$(sudo podman inspect --format '{{.Digest}}' "$IMAGE_FULL:${{ env.DEFAULT_TAG }}")
-
-          sudo podman tag "${{ steps.build.outputs.tag }}" "$IMAGE_FULL:$DATE_TAG"
-          sudo podman push "$IMAGE_FULL:$DATE_TAG"
-
-          echo "IMAGE_FULL=$IMAGE_FULL" >> $GITHUB_ENV
+          IMAGE_DIGEST=$(sudo podman inspect --format '{{.Digest}}' "${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}")
           echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> $GITHUB_ENV
+
+          sudo podman tag "${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}" "${{ env.IMAGE_FULL }}:${{ env.DATE_TAG }}"
+          sudo podman push "${{ env.IMAGE_FULL }}:${{ env.DATE_TAG }}"
 
       - name: Install Cosign
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
@@ -85,4 +78,5 @@ jobs:
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
         run: |
-          cosign sign --yes "$IMAGE_FULL@$IMAGE_DIGEST"
+          cosign sign --yes --new-bundle-format=false --use-signing-config=false --key env://COSIGN_PRIVATE_KEY \
+          "${{ env.IMAGE_FULL }}@$IMAGE_DIGEST"
