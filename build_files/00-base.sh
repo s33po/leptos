@@ -25,7 +25,6 @@ dnf -y remove \
     console-login-helper-messages \
     intel-audio-firmware \
     intel-gpu-firmware \
-    irqbalance \
     insights-core \
     microcode_ctl \
     mt7xxx-firmware \
@@ -52,7 +51,9 @@ dnf -y install --setopt=install_weak_deps=False \
     system-reinstall-bootc \
     systemd-container \
     systemd-resolved \
-    tuned-ppd
+    tuned-ppd \
+    tuned-profiles-atomic \
+    usbutils
 
 # Preset and enable resolved
 tee /usr/lib/systemd/system-preset/91-resolved-default.preset > /dev/null <<'EOF'
