@@ -8,9 +8,7 @@ curl --retry 3 -o /etc/flatpak/remotes.d/flathub.flatpakrepo "https://dl.flathub
 
 # Add default flatpaks to defpaks.list
 tee /etc/flatpak/defpaks.list <<EOF
-com.discordapp.Discord
 io.github.DenysMb.Kontainer
-io.podman_desktop.PodmanDesktop
 org.fooyin.fooyin
 org.gtk.Gtk3theme.Breeze
 org.kde.gwenview
