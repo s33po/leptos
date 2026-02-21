@@ -16,8 +16,10 @@ dnf -y install --setopt=install_weak_deps=False \
     flatpak-kcm \
     kate \
     kate-plugins \
+    kcm-plasmalogin \
     kde-gtk-config \
     kde-partitionmanager \
+    kde-settings-plasmalogin \
     kdegraphics-thumbnailers \
     kf6-baloo-file \
     kio-admin \
@@ -32,13 +34,12 @@ dnf -y install --setopt=install_weak_deps=False \
     plasma-discover \
     plasma-discover-flatpak \
     plasma-disks \
+    plasma-login-manager \
     plasma-milou \
     plasma-nm \
     plasma-pa \
     qt6-qtimageformats \
     samba-client \
-    sddm \
-    sddm-breeze \
     spectacle \
     upower
 

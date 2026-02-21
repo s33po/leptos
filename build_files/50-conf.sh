@@ -18,10 +18,3 @@ sed -i 's|^LookAndFeelPackage=.*|LookAndFeelPackage=org.kde.breezedark.desktop|'
 
 sed -i 's|^ColorScheme=.*|ColorScheme=BreezeDark|' \
   /usr/share/kde-settings/kde-profile/default/xdg/kdeglobals
-
-# SDDM config
-sed -i 's|^#\?Current=.*|Current=breeze|' \
-  /etc/sddm.conf
-
-sed -i 's|^background=.*/images/|background=/usr/share/wallpapers/Next/contents/images_dark/|' \
-  /usr/share/sddm/themes/breeze/theme.conf
