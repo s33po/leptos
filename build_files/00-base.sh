@@ -22,6 +22,7 @@ dnf -y remove \
     adcli \
     atheros-firmware \
     brcmfmac-firmware \
+    btrfs-progs \
     cirrus-audio-firmware \
     console-login-helper-messages \
     intel-audio-firmware \
