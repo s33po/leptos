@@ -1,7 +1,7 @@
 FROM scratch AS ctx
 COPY build_files /build_files
 
-FROM quay.io/almalinuxorg/almalinux-bootc:10-kitten
+FROM quay.io/centos-bootc/centos-bootc:c10s
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/boot \
