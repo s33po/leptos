@@ -36,13 +36,13 @@ dnf -y remove \
     sos \
     sssd* \
     tiwilink-firmware \
-    toolbox \
     yggdrasil*
 
 # Install packages
 dnf -y install --setopt=install_weak_deps=False \
     cifs-utils \
     distrobox \
+    firewalld \
     fuse \
     git-core \
     lshw \
@@ -51,6 +51,7 @@ dnf -y install --setopt=install_weak_deps=False \
     system-reinstall-bootc \
     systemd-container \
     systemd-resolved \
+    thermald \
     tuned-ppd \
     tuned-profiles-atomic \
     usbutils

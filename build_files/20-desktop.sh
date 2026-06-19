@@ -27,8 +27,10 @@ dnf -y install --setopt=install_weak_deps=False \
     konsole \
     kscreen \
     ksshaskpass \
+    mesa-vulkan-drivers \
     pam-kwallet \
     pipewire \
+    pipewire-alsa \
     plymouth-system-theme \
     plasma-desktop \
     plasma-discover \
