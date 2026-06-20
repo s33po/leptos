@@ -6,7 +6,7 @@ set -xeuo pipefail
 dnf -y install glibc-langpack-{en,fi}
 
 # Trimmed KDE installation
-dnf -y install \
+dnf -y install --setopt=install_weak_deps=False \
     alsa-ucm \
     alsa-utils \
     ark \
