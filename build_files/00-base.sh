@@ -26,6 +26,7 @@ dnf -y remove \
     intel-audio-firmware \
     intel-gpu-firmware \
     insights-core \
+    irqbalance \
     microcode_ctl \
     mt7xxx-firmware \
     nfs-utils \
@@ -51,7 +52,6 @@ dnf -y install --setopt=install_weak_deps=False \
     system-reinstall-bootc \
     systemd-container \
     systemd-resolved \
-    thermald \
     tuned-ppd \
     tuned-profiles-atomic \
     usbutils
