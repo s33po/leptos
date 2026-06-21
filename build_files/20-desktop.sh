@@ -8,16 +8,12 @@ dnf -y install glibc-langpack-{en,fi}
 # Trimmed KDE installation
 dnf -y install --setopt=install_weak_deps=False \
     ark \
-    bluedevil \
     breeze-gtk-gtk3 \
-    colord-kde \
-    dbus-daemon \
     default-fonts-core \
     dolphin \
     filelight \
     flatpak \
     flatpak-kcm \
-    initscripts-rename-device \
     kate \
     kate-plugins \
     kcharselect \
@@ -37,14 +33,10 @@ dnf -y install --setopt=install_weak_deps=False \
     konsole \
     kscreen \
     ksshaskpass \
-    libappindicator-gtk3 \
-    libstoragemgmt \
-    libsysfs \
     mesa-vulkan-drivers \
     pam-kwallet \
     phonon-qt6-backend-vlc \
     pipewire \
-    pipewire-alsa \
     pipewire-utils \
     plymouth-system-theme \
     plasma-desktop \
@@ -57,7 +49,6 @@ dnf -y install --setopt=install_weak_deps=False \
     plasma-nm \
     plasma-pa \
     plasma-systemmonitor \
-    prefixdevname \
     qt6-qtimageformats \
     samba-client \
     spectacle \
