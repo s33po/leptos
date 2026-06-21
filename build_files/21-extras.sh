@@ -8,6 +8,7 @@ dnf -y install \
     btop \
     fastfetch \
     fzf \
+    gum \
     just \
     mtr \
     nvtop \
