@@ -21,10 +21,8 @@ dnf -y install --setopt=install_weak_deps=False \
     kde-gtk-config \
     kde-partitionmanager \
     kde-settings-plasmalogin \
-    kde-settings-pulseaudio \
     kdegraphics-thumbnailers \
     kdialog \
-    kdnssd \
     kf6-baloo-file \
     kfind \
     kinfocenter \
@@ -35,14 +33,11 @@ dnf -y install --setopt=install_weak_deps=False \
     ksshaskpass \
     mesa-vulkan-drivers \
     pam-kwallet \
-    phonon-qt6-backend-vlc \
     pipewire \
-    pipewire-utils \
     plymouth-system-theme \
     plasma-desktop \
     plasma-discover \
     plasma-discover-flatpak \
-    plasma-discover-notifier \
     plasma-disks \
     plasma-login-manager \
     plasma-milou \
@@ -54,7 +49,6 @@ dnf -y install --setopt=install_weak_deps=False \
     spectacle \
     upower \
     xfsdump \
-    xsettingsd \
     zip
 
 systemctl set-default graphical.target
