@@ -2,6 +2,9 @@
 
 set -xeuo pipefail
 
+# Disable point in time compose repos that were used during the build
+dnf config-manager --set-disabled baseos-compose,appstream-compose
+
 # Remove Fedora Plasma look-and-feel
 rm -rf /usr/share/plasma/look-and-feel/org.fedoraproject.{fedora,fedoralight,fedoradark}.desktop
 rm -rf /usr/share/sddm/themes/01-breeze-fedora
