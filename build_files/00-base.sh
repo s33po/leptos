@@ -2,6 +2,14 @@
 
 set -xeuo pipefail
 
+# Enable the same compose repos that the centos-bootc base image uses
+curl --retry 3 -Lo /etc/yum.repos.d/compose.repo https://gitlab.com/redhat/centos-stream/containers/bootc/-/raw/c10s/cs.repo
+sed -r \
+    -e 's@(baseos|appstream)@&-compose@' \
+    -e 's@- (BaseOS|AppStream)@& - Compose@' \
+    -e 's@/usr/share/distribution-gpg-keys/centos/RPM-GPG-KEY-CentOS-Official@/etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial-SHA256@' \
+    -i /etc/yum.repos.d/compose.repo
+
 # Remove subscription-manager, install EPEL and enable CRB
 dnf -y remove subscription-manager
 dnf config-manager --set-enabled crb
