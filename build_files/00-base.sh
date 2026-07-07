@@ -50,6 +50,8 @@ dnf -y remove \
 # Install packages
 dnf -y install --setopt=install_weak_deps=False \
     cifs-utils \
+    container-tools \
+    podman-compose \
     distrobox \
     firewalld \
     fuse \
@@ -61,7 +63,6 @@ dnf -y install --setopt=install_weak_deps=False \
     systemd-container \
     systemd-resolved \
     tuned-ppd \
-    tuned-profiles-atomic \
     usbutils
 
 # Preset and enable resolved
