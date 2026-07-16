@@ -34,7 +34,8 @@ dnf -y install --setopt=install_weak_deps=False \
     nano \
     openssl \
     xfsdump \
-    ncurses
+    ncurses \
+    wget
 
 # Preset and enable resolved
 tee /usr/lib/systemd/system-preset/91-resolved-default.preset > /dev/null <<'EOF'

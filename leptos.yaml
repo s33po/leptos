@@ -1,16 +1,14 @@
-recommends: true
-
 include:
   - minimal-plus/manifest.yaml
   - standard/autoupdates.yaml
   - standard/system-configuration.yaml
   - standard/persistent-journal.yaml
+  - standard/initramfs-full.yaml
   - standard/generic-growfs.yaml
 
 packages:
   - zstd
   - python3-rpm
-  - man-db
   - dnf-yum
   - dnf-bootc
   - plymouth
@@ -42,9 +40,16 @@ postprocess:
   - |
     #!/usr/bin/env bash
     set -xeuo pipefail
-    mkdir -p /usr/lib/dracut/dracut.conf.d
-    cat > /usr/lib/dracut/dracut.conf.d/30-bootc-standard.conf << 'EOF'
-    add_dracutmodules+=" plymouth lvm crypt fips "
+    mkdir -p /etc/dracut.conf.d
+    echo 'add_dracutmodules+=" plymouth "' > /etc/dracut.conf.d/plymouth.conf
+    mkdir -p /etc/plymouth
+    cat > /etc/plymouth/plymouthd.conf <<EOF
+    [Daemon]
+    Theme=spinner
+    EOF
+    mkdir -p /usr/lib/bootc/kargs.d
+    cat > /usr/lib/bootc/kargs.d/plymouth.toml <<EOF
+    kargs = ["splash", "quiet", "loglevel=2"]
     EOF
   - |
     #!/usr/bin/env bash
@@ -57,5 +62,4 @@ postprocess:
   - |
     #!/usr/bin/env bash
     set -euo pipefail
-    dnf clean all
     systemctl preset-all
