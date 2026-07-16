@@ -1,3 +1,5 @@
+recommends: true
+
 include:
   - minimal-plus/manifest.yaml
   - standard/autoupdates.yaml
@@ -7,6 +9,8 @@ include:
   - standard/generic-growfs.yaml
 
 packages:
+  - amd-gpu-firmware
+  - amd-ucode-firmware
   - zstd
   - python3-rpm
   - dnf-yum

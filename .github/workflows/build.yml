@@ -59,6 +59,7 @@ jobs:
             org.opencontainers.image.version=${{ env.MAJOR_VERSION }}.${{ env.DATE_TAG }}
             containers.bootc=1
           push: true
+          max-layers: 128
 
       - name: Add date-specific tag and get digest
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
