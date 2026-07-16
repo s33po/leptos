@@ -11,34 +11,6 @@ dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noar
 dnf config-manager --save \
     --setopt=max_parallel_downloads=10
 
-# FIXME: Workaround needed to remove intel microcode and nfs-utils..
-mkdir -p /var/lib/rpm-state
-touch /var/lib/rpm-state/microcode_ctl_un_{intel-ucode,ucode_caveats,file_list}
-touch /var/lib/rpm-state/nfs-server.cleanup
-
-# Remove unnecessary firmware and packages
-dnf -y remove \
-    adcli \
-    atheros-firmware \
-    brcmfmac-firmware \
-    cirrus-audio-firmware \
-    console-login-helper-messages \
-    intel-audio-firmware \
-    intel-gpu-firmware \
-    insights-core \
-    irqbalance \
-    microcode_ctl \
-    mt7xxx-firmware \
-    nfs-utils \
-    nvidia-gpu-firmware \
-    nxpwireless-firmware \
-    openssh-server \
-    realtek-firmware \
-    sos \
-    sssd* \
-    tiwilink-firmware \
-    yggdrasil*
-
 # Install packages
 dnf -y install --setopt=install_weak_deps=False \
     cifs-utils \
@@ -55,7 +27,14 @@ dnf -y install --setopt=install_weak_deps=False \
     systemd-container \
     systemd-resolved \
     tuned-ppd \
-    usbutils
+    usbutils \
+    nvme-cli \
+    lsof \
+    bind-utils \
+    nano \
+    openssl \
+    xfsdump \
+    ncurses
 
 # Preset and enable resolved
 tee /usr/lib/systemd/system-preset/91-resolved-default.preset > /dev/null <<'EOF'

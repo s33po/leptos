@@ -19,7 +19,6 @@ SCRIPTS_TO_RUN=(
   "40-flatpak.sh"
   "50-conf.sh"
   "60-services.sh"
-  "90-initramfs.sh"
 )
 
 printf "::group:: ===== Executing build scripts =====\n"

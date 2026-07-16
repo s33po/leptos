@@ -1,6 +1,20 @@
+recommends: true
+
+include:
+  - minimal-plus/manifest.yaml
+  - standard/autoupdates.yaml
+  - standard/system-configuration.yaml
+  - standard/persistent-journal.yaml
+  - standard/generic-growfs.yaml
+
 packages:
+  - zstd
+  - python3-rpm
+  - man-db
   - dnf-yum
   - dnf-bootc
+  - plymouth
+  - plymouth-system-theme
 
 exclude-packages:
   - kernel-debug-uki-virt
@@ -15,13 +29,26 @@ exclude-packages:
   - nxpwireless-firmware
   - realtek-firmware
   - tiwilink-firmware
+  - perl
+  - perl-interpreter
+  - nodejs
+  - grubby
+  - initscripts
+  - NetworkManager-initscripts-ifcfg-rh
+  - iptables-legacy
+  - systemd-networkd
 
 postprocess:
   - |
     #!/usr/bin/env bash
-
+    set -xeuo pipefail
+    mkdir -p /usr/lib/dracut/dracut.conf.d
+    cat > /usr/lib/dracut/dracut.conf.d/30-bootc-standard.conf << 'EOF'
+    add_dracutmodules+=" plymouth lvm crypt fips "
+    EOF
+  - |
+    #!/usr/bin/env bash
     set -euo pipefail
-
     mkdir -p /usr/lib/bootc/install/
     cat > /usr/lib/bootc/install/20-rhel.toml << EOF
     [install]
@@ -31,8 +58,4 @@ postprocess:
     #!/usr/bin/env bash
     set -euo pipefail
     dnf clean all
-    rm /var/{log,cache,lib}/* -rf
     systemctl preset-all
-
-include:
-  - standard/manifest.yaml
