@@ -14,6 +14,7 @@ org.gtk.Gtk3theme.Breeze
 org.kde.gwenview
 org.kde.haruna
 org.kde.kcalc
+org.kde.krdc
 org.kde.okular
 org.libreoffice.LibreOffice
 org.mozilla.firefox
@@ -22,5 +23,5 @@ EOF
 # Add gaming flatpaks to gaming.list
 tee /etc/flatpak/gaming.list <<EOF
 com.valvesoftware.Steam
-com.valvesoftware.Steam.CompatibilityTool.Proton-GE
+com.discordapp.Discord
 EOF

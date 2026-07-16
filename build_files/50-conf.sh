@@ -2,9 +2,6 @@
 
 set -xeuo pipefail
 
-# Disable lastlog display
-authselect enable-feature with-silent-lastlog
-
 # Add user.just to image
 install -Dm644 /ctx/build_files/user.just /usr/share/just/user.just
 
@@ -30,7 +27,6 @@ except for select network services. Incoming packets that are related to
 outgoing network connections are accepted. Outgoing network connections are
 allowed.</description>
   <service name="dhcpv6-client"/>
-  <service name="ssh"/>
   <service name="samba-client"/>
   <port protocol="udp" port="1025-65535"/>
   <port protocol="tcp" port="1025-65535"/>

@@ -16,7 +16,6 @@ dnf -y install --setopt=install_weak_deps=False \
     flatpak-kcm \
     kate \
     kate-plugins \
-    kcharselect \
     kcm-plasmalogin \
     kde-gtk-config \
     kde-partitionmanager \
@@ -25,7 +24,6 @@ dnf -y install --setopt=install_weak_deps=False \
     kdialog \
     kf6-baloo-file \
     kfind \
-    kinfocenter \
     kio-admin \
     kjournald \
     konsole \
@@ -34,7 +32,6 @@ dnf -y install --setopt=install_weak_deps=False \
     mesa-vulkan-drivers \
     pam-kwallet \
     pipewire \
-    plymouth-system-theme \
     plasma-desktop \
     plasma-discover \
     plasma-discover-flatpak \
@@ -43,12 +40,9 @@ dnf -y install --setopt=install_weak_deps=False \
     plasma-milou \
     plasma-nm \
     plasma-pa \
-    plasma-systemmonitor \
     qt6-qtimageformats \
     samba-client \
     spectacle \
-    upower \
-    xfsdump \
-    zip
+    upower
 
 systemctl set-default graphical.target

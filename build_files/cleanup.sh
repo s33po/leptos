@@ -2,9 +2,6 @@
 
 set -xeuo pipefail
 
-# Disable point in time compose repos that were used during the build
-dnf config-manager --set-disabled baseos-compose,appstream-compose
-
 # Remove Fedora Plasma look-and-feel
 rm -rf /usr/share/plasma/look-and-feel/org.fedoraproject.{fedora,fedoralight,fedoradark}.desktop
 rm -rf /usr/share/sddm/themes/01-breeze-fedora
@@ -29,5 +26,7 @@ find /usr/share/qt6/translations/qtwebengine_locales/* -mindepth 0 -maxdepth 0 \
 # Final cleanup
 dnf clean all
 find /var -mindepth 1 -delete
-find /boot -mindepth 1 -delete
-find /tmp -mindepth 1 -delete
+mkdir -p /var/tmp
+rm -rf /boot/* || true
+rm -rf /boot/.* || true
+rm -rf /tmp/* || true
