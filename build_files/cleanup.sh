@@ -23,10 +23,4 @@ find /usr/share/qt6/translations/qtwebengine_locales/* -mindepth 0 -maxdepth 0 \
     ! -name "en-US.pak" ! -name "fi.pak" \
     -exec rm -rf {} + > /dev/null 2>&1 || true
 
-# Final cleanup
 dnf clean all
-find /var -mindepth 1 -delete
-mkdir -p /var/tmp
-rm -rf /boot/* || true
-rm -rf /boot/.* || true
-rm -rf /tmp/* || true

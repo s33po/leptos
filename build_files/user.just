@@ -46,7 +46,7 @@ clean-system:
     podman volume prune -f
 
     echo "Cleaning ostree..."
-    rpm-ostree cleanup -bm
+    sudo rpm-ostree cleanup -bm
 
     echo "Cleaning logs..."
     sudo journalctl --vacuum-time=7d

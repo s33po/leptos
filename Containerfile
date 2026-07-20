@@ -9,7 +9,7 @@ RUN chmod +x /usr/libexec/bootc-base-imagectl
 
 COPY leptos.yaml /usr/share/doc/bootc-base-imagectl/manifests/
 
-RUN /usr/libexec/bootc-base-imagectl build-rootfs --reinject --manifest=leptos /target-rootfs
+RUN /usr/libexec/bootc-base-imagectl build-rootfs --no-initramfs --reinject --manifest=leptos /target-rootfs
 
 ###
 
@@ -22,6 +22,11 @@ RUN --mount=type=bind,source=build_files,target=/ctx/build_files \
     --mount=type=tmpfs,dst=/tmp \
     /ctx/build_files/build.sh
 
+# Final cleanup
+RUN rm -rf /boot /var /tmp && mkdir -p /boot /var /var/tmp /tmp
+
+RUN --mount=type=tmpfs,target=/run bootc container lint --fatal-warnings
+
 LABEL containers.bootc 1
 LABEL ostree.bootable 1
 
@@ -29,5 +34,3 @@ ENV container=oci
 
 STOPSIGNAL SIGRTMIN+3
 CMD ["/sbin/init"]
-
-RUN --mount=type=tmpfs,target=/run bootc container lint --fatal-warnings

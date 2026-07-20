@@ -10,11 +10,11 @@ echo "alias jmain='just --justfile /usr/share/just/user.just'" > /etc/profile.d/
 chmod 644 /etc/profile.d/jmain.sh
 
 # Use breezedark by default
-sed -i 's|^LookAndFeelPackage=.*|LookAndFeelPackage=org.kde.breezedark.desktop|' \
-  /usr/share/kde-settings/kde-profile/default/xdg/kdeglobals
+#sed -i 's|^LookAndFeelPackage=.*|LookAndFeelPackage=org.kde.breezedark.desktop|' \
+#  /usr/share/kde-settings/kde-profile/default/xdg/kdeglobals
 
-sed -i 's|^ColorScheme=.*|ColorScheme=BreezeDark|' \
-  /usr/share/kde-settings/kde-profile/default/xdg/kdeglobals
+#sed -i 's|^ColorScheme=.*|ColorScheme=BreezeDark|' \
+#  /usr/share/kde-settings/kde-profile/default/xdg/kdeglobals
 
 # Write firewalld zone "Workstation" (more permissive than stock)
 mkdir -p /usr/lib/firewalld/zones

@@ -40,6 +40,8 @@ dnf -y install --setopt=install_weak_deps=False \
     plasma-milou \
     plasma-nm \
     plasma-pa \
+    plymouth \
+    plymouth-system-theme \
     qt6-qtimageformats \
     samba-client \
     spectacle \

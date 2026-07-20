@@ -14,5 +14,4 @@ dnf -y install \
     nvtop \
     steam-devices \
     time \
-    goose \
     tree

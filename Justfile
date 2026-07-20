@@ -11,7 +11,13 @@ default:
 build:
     #!/usr/bin/env bash
     set -euo pipefail
-    podman build --pull=newer --no-cache -t {{ image_name }}:{{ tag }} .
+    podman build \
+        --cap-add=all \
+        --no-cache \
+        --security-opt=label=type:container_runtime_t \
+        --device /dev/fuse \
+        --pull=newer \
+        -t {{ image_name }}:{{ tag }} .
 
 # Build qcow2
 build-vm:

@@ -2,21 +2,14 @@
 
 set -xeuo pipefail
 
-# Add plymouth module
+# Add plymouth and drm module
 mkdir -p /etc/dracut.conf.d
-echo 'add_dracutmodules+=" plymouth "' > /etc/dracut.conf.d/plymouth.conf
-
-# Set theme
-mkdir -p /etc/plymouth
-cat > /etc/plymouth/plymouthd.conf <<EOF
-[Daemon]
-Theme=spinner
-EOF
+echo 'add_dracutmodules+=" drm plymouth "' > /etc/dracut.conf.d/plymouth.conf
 
 # Quiet boot
 mkdir -p /usr/lib/bootc/kargs.d
 cat > /usr/lib/bootc/kargs.d/plymouth.toml <<EOF
-kargs = ["splash", "quiet", "loglevel=2"]
+kargs = ["splash", "rhgb"]
 EOF
 
 # Generate initramfs
