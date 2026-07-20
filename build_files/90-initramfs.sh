@@ -9,7 +9,7 @@ echo 'add_dracutmodules+=" drm plymouth "' > /etc/dracut.conf.d/plymouth.conf
 # Quiet boot
 mkdir -p /usr/lib/bootc/kargs.d
 cat > /usr/lib/bootc/kargs.d/plymouth.toml <<EOF
-kargs = ["splash", "rhgb"]
+kargs = ["quiet", "rhgb"]
 EOF
 
 # Generate initramfs
