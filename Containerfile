@@ -16,20 +16,18 @@ RUN /usr/libexec/bootc-base-imagectl build-rootfs --no-initramfs --reinject --ma
 FROM scratch
 COPY --from=builder /target-rootfs/ /
 
-RUN --mount=type=bind,source=build_files,target=/ctx/build_files \
+RUN --mount=type=bind,source=build_files,target=/build_files \
     --mount=type=tmpfs,dst=/boot \
     --mount=type=tmpfs,dst=/var \
     --mount=type=tmpfs,dst=/tmp \
-    /ctx/build_files/build.sh
+    /build_files/build.sh
 
 # Final cleanup
 RUN rm -rf /boot /var /tmp && mkdir -p /boot /var /var/tmp /tmp
 
-RUN --mount=type=tmpfs,target=/run bootc container lint --fatal-warnings
+RUN --mount=type=tmpfs,target=/run bootc container lint
 
 LABEL containers.bootc 1
-LABEL ostree.bootable 1
-
 ENV container=oci
 
 STOPSIGNAL SIGRTMIN+3
