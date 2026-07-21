@@ -47,10 +47,9 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
         uses: redhat-actions/buildah-build@v2.13
         with:
-          image: ${{ env.IMAGE_NAME }}
           tags: |
-            ${{ env.DEFAULT_TAG }}
-            ${{ env.DATE_TAG }}
+            ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
+            ${{ env.IMAGE_FULL }}:${{ env.DATE_TAG }}
           containerfiles: ./Containerfile
           build-args: |
             BASE_IMG=${{ env.BASE_IMG }}
@@ -87,11 +86,9 @@ jobs:
         uses: redhat-actions/push-to-registry@v2.8
         id: "push"
         with:
-          image: ${{ env.IMAGE_NAME }}
-          registry: ghcr.io/s33po
           tags: |
-            ${{ env.DEFAULT_TAG }}
-            ${{ env.DATE_TAG }}
+            ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
+            ${{ env.IMAGE_FULL }}:${{ env.DATE_TAG }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
