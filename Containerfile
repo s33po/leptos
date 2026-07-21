@@ -30,17 +30,16 @@ RUN rm -rf /boot /var /tmp && mkdir -p /boot /var /var/tmp /tmp
 
 RUN --mount=type=tmpfs,target=/run bootc container lint
 
+STOPSIGNAL SIGRTMIN+3
+CMD ["/sbin/init"]
+
 FROM quay.io/coreos/chunkah AS chunkah
 ARG CHUNKAH_CONFIG_STR
 RUN --mount=from=builder,src=/,target=/chunkah,ro \
     --mount=type=bind,target=/run/src,rw \
     chunkah build --prune /sysroot/ \
     --label ostree.commit- --label ostree.final-diffid- \
-    --max-layers 127 --compressed \
+    --label containers.bootc=1 --max-layers 127 --compressed \
     --output oci:/run/src/out
 
 FROM oci:out
-
-LABEL containers.bootc 1
-STOPSIGNAL SIGRTMIN+3
-CMD ["/sbin/init"]

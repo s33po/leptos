@@ -43,22 +43,14 @@ jobs:
         run: |
             echo "DATE_TAG=${DEFAULT_TAG}.$(date -u +%Y%m%d)" >> "$GITHUB_ENV"
 
-      - name: GHCR Login
-        if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
-        uses: redhat-actions/podman-login@v1.7
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build & Rechunk image
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
         uses: redhat-actions/buildah-build@v2.13
         with:
           image: ${{ env.IMAGE_NAME }}
           tags: |
-            ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
-            ${{ env.IMAGE_FULL }}:${{ env.DATE_TAG }}
+            ${{ env.DEFAULT_TAG }}
+            ${{ env.DATE_TAG }}
           containerfiles: ./Containerfile
           build-args: |
             BASE_IMG=${{ env.BASE_IMG }}
@@ -68,27 +60,26 @@ jobs:
             --skip-unused-stages=false
             --device /dev/fuse
 
+      - name: GHCR Login
+        if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
+        uses: redhat-actions/podman-login@v1.7
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Push image
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
         uses: redhat-actions/push-to-registry@v2.8
+        id: "push"
         with:
           image: ${{ env.IMAGE_NAME }}
-          tags: |
-            ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
-            ${{ env.IMAGE_FULL }}:${{ env.DATE_TAG }}
           registry: ${{ env.IMAGE_FULL }}
+          tags: |
+            ${{ env.DEFAULT_TAG }}
+            ${{ env.DATE_TAG }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          extra-args: |
-            --compression-format=zstd:chunked
-            --compression-level=3
-            --force-compression
-
-      - name: Get digest
-        if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
-        run: |
-          IMAGE_DIGEST=$(podman inspect --format '{{.Digest}}' "${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}")
-          echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> $GITHUB_ENV
 
       - name: Install Cosign
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
@@ -96,8 +87,15 @@ jobs:
 
       - name: Sign image by digest
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
+        shell: "bash"
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
+          DIGEST: ${{ steps.push.outputs.digest }}
+          IMG: ${{ env.IMAGE_FULL }}
         run: |
-          cosign sign --yes --new-bundle-format=false --use-signing-config=false --key env://COSIGN_PRIVATE_KEY \
-          "${{ env.IMAGE_FULL }}@$IMAGE_DIGEST"
+          set -euo pipefail
+          cosign sign --yes \
+            --new-bundle-format=false \
+            --use-signing-config=false \
+            --key env://COSIGN_PRIVATE_KEY \
+            "${IMG}@${DIGEST}"
