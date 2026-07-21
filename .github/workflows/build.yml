@@ -57,7 +57,6 @@ jobs:
         with:
           image: ${{ env.IMAGE_NAME }}
           tags: |
-            ${{ env.DEFAULT_TAG }}
             ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
             ${{ env.IMAGE_FULL }}:${{ env.DATE_TAG }}
           containerfiles: ./Containerfile
@@ -75,7 +74,6 @@ jobs:
         with:
           image: ${{ env.IMAGE_NAME }}
           tags: |
-            ${{ env.DEFAULT_TAG }}
             ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
             ${{ env.IMAGE_FULL }}:${{ env.DATE_TAG }}
           registry: ${{ env.IMAGE_FULL }}
