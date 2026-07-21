@@ -15,7 +15,7 @@ concurrency:
 jobs:
   build_push:
     name: Build and push image
-    runs-on: ubuntu-26.04
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
@@ -49,7 +49,7 @@ jobs:
             ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
           extra-args: |
             --cap-add=all
-            --security-opt=label=disable
+            --security-opt label=type:unconfined_t
             --skip-unused-stages=false
             --device /dev/fuse
 
