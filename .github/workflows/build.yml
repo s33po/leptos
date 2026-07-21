@@ -49,7 +49,7 @@ jobs:
             ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
           extra-args: |
             --cap-add=all
-            --security-opt label=type:unconfined_t
+            --security-opt=label=type:unconfined_t
             --skip-unused-stages=false
             --device /dev/fuse
 
@@ -64,7 +64,7 @@ jobs:
             -e CHUNKAH_CONFIG_STR="$CHUNKAH_CONFIG_STR" \
             quay.io/coreos/chunkah build \
             --prune /sysroot/ --label ostree.commit- --label ostree.final-diffid- \
-            --label containers.bootc=1 --max-layers 127 \
+            --label containers.bootc=1 --compressed --max-layers 127 \
             --tag ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }} \
           | podman load
 
