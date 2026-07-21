@@ -43,7 +43,7 @@ jobs:
         run: |
             echo "DATE_TAG=${DEFAULT_TAG}.$(date -u +%Y%m%d)" >> "$GITHUB_ENV"
 
-      - name: Build & Rechunk image
+      - name: Build
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
         uses: redhat-actions/buildah-build@v2.13
         with:
@@ -53,13 +53,26 @@ jobs:
             ${{ env.DATE_TAG }}
           containerfiles: ./Containerfile
           build-args: |
-            CHUNKAH_CONFIG_STR="$(podman inspect "quay.io/centos-bootc/centos-bootc:stream10")"
             BASE_IMG=${{ env.BASE_IMG }}
           extra-args: |
             --cap-add=all
             --security-opt=label=type:container_runtime_t
             --skip-unused-stages=false
             --device /dev/fuse
+
+      - name: Rechunk
+        if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
+        run: |
+          set -euo pipefail
+          export CHUNKAH_CONFIG_STR="$(podman inspect "${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}")"
+          podman run --rm \
+            --mount=type=image,src="${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}",target=/chunkah \
+            -e CHUNKAH_CONFIG_STR="$CHUNKAH_CONFIG_STR" \
+            quay.io/coreos/chunkah build \
+            --prune /sysroot/ --label ostree.commit- --label ostree.final-diffid- \
+            --label containers.bootc=1 --compressed --max-layers 128 \
+            --tag ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }} \
+          | podman load
 
       - name: GHCR Login
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
@@ -75,7 +88,7 @@ jobs:
         id: "push"
         with:
           image: ${{ env.IMAGE_NAME }}
-          registry: ${{ env.IMAGE_FULL }}
+          registry: ghcr.io/s33po
           tags: |
             ${{ env.DEFAULT_TAG }}
             ${{ env.DATE_TAG }}
