@@ -53,6 +53,7 @@ jobs:
             ${{ env.DATE_TAG }}
           containerfiles: ./Containerfile
           build-args: |
+            CHUNKAH_CONFIG_STR="$(podman inspect "quay.io/centos-bootc/centos-bootc:stream10")"
             BASE_IMG=${{ env.BASE_IMG }}
           extra-args: |
             --cap-add=all
