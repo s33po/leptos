@@ -22,6 +22,7 @@ dnf -y install --setopt=install_weak_deps=False \
     fuse \
     git-core \
     lshw \
+    make \
     qemu-guest-agent \
     rsync \
     system-reinstall-bootc \

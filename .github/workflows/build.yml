@@ -9,6 +9,7 @@ env:
   IMAGE_FULL: ghcr.io/${{ github.repository }}
   MAJOR_VERSION: 10
   DEFAULT_TAG: ${{ github.ref_name }}
+  BASE_IMG: quay.io/centos/centos:stream10
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -27,18 +28,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Set date tag
-        id: date
-        run: |
-            echo "DATE_TAG=${DEFAULT_TAG}.$(date -u +%Y%m%d)" >> "$GITHUB_ENV"
-
-      - name: GHCR Login
-        uses: redhat-actions/podman-login@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Check for updates
         if: ${{ github.event_name == 'schedule' }}  # Only run if triggered by schedule
         run: |
@@ -48,46 +37,62 @@ jobs:
           echo "upd=${upd}" >> "$GITHUB_ENV"
           echo "Exit code from dnf check-update: '${upd}'"
 
-      - name: Build
+      - name: Set date tag
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
+        id: date
         run: |
-          buildah bud \
-            --cap-add=all \
-            --security-opt=label=type:container_runtime_t \
-            --skip-unused-stages=false \
-            --device /dev/fuse \
-            --pull=newer \
-            --label=org.opencontainers.image.title=${{ env.IMAGE_NAME }} \
-            --label=org.opencontainers.image.version=${{ env.MAJOR_VERSION }}.${{ env.DATE_TAG }} \
-            -t ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
+            echo "DATE_TAG=${DEFAULT_TAG}.$(date -u +%Y%m%d)" >> "$GITHUB_ENV"
 
-      - name: Rechunk
+      - name: GHCR Login
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
-        run: |
-          export CHUNKAH_CONFIG_STR="$(podman inspect "${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}")"
+        uses: redhat-actions/podman-login@v1.7
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-          podman run --rm \
-            --mount=type=image,src="${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}",target=/chunkah \
-            -e CHUNKAH_CONFIG_STR="$CHUNKAH_CONFIG_STR" \
-            quay.io/coreos/chunkah build \
-            --prune /sysroot/ --label ostree.commit- --label ostree.final-diffid- \
-            --label containers.bootc=1 --compressed --max-layers 128 \
-            --tag ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }} \
-          | podman load
-
-      - name: Push
+      - name: Build & Rechunk image
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
-        run: |
-          podman push ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
+        uses: redhat-actions/buildah-build@v2.13
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: |
+            ${{ env.DEFAULT_TAG }}
+            ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
+            ${{ env.IMAGE_FULL }}:${{ env.DATE_TAG }}
+          containerfiles: ./Containerfile
+          build-args: |
+            BASE_IMG=${{ env.BASE_IMG }}
+          extra-args: |
+            --cap-add=all
+            --security-opt=label=type:container_runtime_t
+            --skip-unused-stages=false
+            --device /dev/fuse
 
-      - name: Add date-specific tag and get digest
+      - name: Push image
+        if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
+        uses: redhat-actions/push-to-registry@v2.8
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: |
+            ${{ env.DEFAULT_TAG }}
+            ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
+            ${{ env.IMAGE_FULL }}:${{ env.DATE_TAG }}
+          registry: ${{ env.IMAGE_FULL }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          extra-args: |
+            --compression-format=zstd:chunked
+            --compression-level=3
+            --force-compression
+            --label=org.opencontainers.image.title=${{ env.IMAGE_NAME }}
+            --label=org.opencontainers.image.version=${{ env.MAJOR_VERSION }}.${{ env.DATE_TAG }}
+
+      - name: Get digest
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
         run: |
           IMAGE_DIGEST=$(podman inspect --format '{{.Digest}}' "${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}")
           echo "IMAGE_DIGEST=$IMAGE_DIGEST" >> $GITHUB_ENV
-
-          podman tag "${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}" "${{ env.IMAGE_FULL }}:${{ env.DATE_TAG }}"
-          podman push "${{ env.IMAGE_FULL }}:${{ env.DATE_TAG }}"
 
       - name: Install Cosign
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}

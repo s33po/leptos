@@ -1,28 +1,24 @@
 IMAGE_NAME ?= localhost/leptos:latest
 REMOTE_IMG ?= ghcr.io/s33po/leptos:main
+BASE_IMG ?= quay.io/centos/centos:stream10
+
 
 .PHONY: build
 build:
-	podman build \
-		--cap-add=all \
-		--security-opt=label=type:container_runtime_t \
-		--device /dev/fuse \
-		--pull=newer \
-		-t $(IMAGE_NAME) .
-
-.PHONY: buildah
-buildah:
-	buildah bud \
+	buildah build \
 		--cap-add=all \
 		--security-opt=label=type:container_runtime_t \
 		--skip-unused-stages=false \
 		--device /dev/fuse \
 		--pull=newer \
+		-f ./Containerfile \
+		--build-arg BASE_IMG=$(BASE_IMG) \
+		--build-arg CHUNKAH_CONFIG_STR="$$(podman inspect $(BASE_IMG))" \
 		-t $(IMAGE_NAME) .
 
 .PHONY: chunkah
 chunkah:
-	export CHUNKAH_CONFIG_STR="$$(podman inspect $(IMAGE_NAME))"
+	export CHUNKAH_CONFIG_STR="$$(podman inspect $(BASE_IMG))"
 	podman run --rm \
 		"--mount=type=image,src=$(IMAGE_NAME),target=/chunkah" \
 		-e CHUNKAH_CONFIG_STR quay.io/coreos/chunkah build \
@@ -59,8 +55,7 @@ build-iso:
 .PHONY: clean
 clean:
 	sudo rm -rf ./output || true
-	rm -f config.toml
+	rm -f config.toml || true
 	podman rmi localhost/leptos || true
 	podman image prune -f || true
 	sudo podman image prune -a -f || true
-	echo "Cleanup complete!"

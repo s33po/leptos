@@ -1,5 +1,8 @@
+ARG BASE_IMG
+ARG CHUNKAH_CONFIG_STR
+
 FROM quay.io/centos-bootc/centos-bootc:stream10 AS imagectl
-FROM quay.io/centos/centos:stream10 AS builder
+FROM ${BASE_IMG} AS builder
 
 RUN dnf install -y rpm-ostree selinux-policy-targeted python3
 
@@ -27,8 +30,17 @@ RUN rm -rf /boot /var /tmp && mkdir -p /boot /var /var/tmp /tmp
 
 RUN --mount=type=tmpfs,target=/run bootc container lint
 
-LABEL containers.bootc 1
-ENV container=oci
+FROM quay.io/coreos/chunkah AS chunkah
+ARG CHUNKAH_CONFIG_STR
+RUN --mount=from=builder,src=/,target=/chunkah,ro \
+    --mount=type=bind,target=/run/src,rw \
+    chunkah build --prune /sysroot/ \
+    --label ostree.commit- --label ostree.final-diffid- \
+    --max-layers 127 --compressed \
+    --output oci:/run/src/out
 
+FROM oci:out
+
+LABEL containers.bootc 1
 STOPSIGNAL SIGRTMIN+3
 CMD ["/sbin/init"]
