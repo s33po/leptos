@@ -1,8 +1,5 @@
-ARG BASE_IMG
-ARG CHUNKAH_CONFIG_STR
-
 FROM quay.io/centos-bootc/centos-bootc:stream10 AS imagectl
-FROM ${BASE_IMG} AS builder
+FROM quay.io/centos/centos:stream10 AS builder
 
 RUN dnf install -y rpm-ostree selinux-policy-targeted python3
 
