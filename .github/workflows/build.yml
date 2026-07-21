@@ -83,8 +83,6 @@ jobs:
             --compression-format=zstd:chunked
             --compression-level=3
             --force-compression
-            --label=org.opencontainers.image.title=${{ env.IMAGE_NAME }}
-            --label=org.opencontainers.image.version=${{ env.MAJOR_VERSION }}.${{ env.DATE_TAG }}
 
       - name: Get digest
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
