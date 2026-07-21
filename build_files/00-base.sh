@@ -6,6 +6,7 @@ set -xeuo pipefail
 dnf -y install 'dnf-command(config-manager)'
 dnf config-manager --set-enabled crb
 dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
+dnf -y upgrade epel-release
 
 # Set global dnf options
 dnf config-manager --save \
