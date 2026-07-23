@@ -3,9 +3,8 @@
 set -xeuo pipefail
 
 # Install EPEL and enable CRB
-dnf -y install 'dnf-command(config-manager)'
+dnf -y install 'dnf-command(config-manager)' epel-release
 dnf config-manager --set-enabled crb
-dnf -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm
 dnf -y upgrade epel-release
 
 # Set global dnf options
@@ -16,10 +15,8 @@ dnf config-manager --save \
 dnf -y install --setopt=install_weak_deps=False \
     cifs-utils \
     container-tools \
-    podman-compose \
     distrobox \
     firewalld \
-    fuse \
     git-core \
     lshw \
     make \
@@ -28,15 +25,17 @@ dnf -y install --setopt=install_weak_deps=False \
     system-reinstall-bootc \
     systemd-container \
     systemd-resolved \
+    time \
+    tmux \
+    toolbox \
+    tree \
     tuned-ppd \
     usbutils \
-    nvme-cli \
     lsof \
     bind-utils \
-    nano \
-    openssl \
     xfsdump \
-    ncurses \
+    vim-enhanced \
+    vim-common \
     wget
 
 # Preset and enable resolved
@@ -57,7 +56,8 @@ sed -i 's|^ExecStart=.*|ExecStart=/usr/bin/bootc update --quiet|' \
 # Set update interval and ensure the timer persist across reboots
 sed -i \
     -e 's|^OnUnitInactiveSec=.*|OnUnitInactiveSec=3d|' \
-    -e 's|^#\?Persistent=.*|Persistent=true|' \
+    -e '/^#\?Persistent=/{s||Persistent=true|;b}' \
+    -e '$aPersistent=true' \
     /usr/lib/systemd/system/bootc-fetch-apply-updates.timer
 
 # Set automatic update policy to 'stage'

@@ -10,8 +10,6 @@ dnf -y install \
     fzf \
     gum \
     just \
-    mtr \
     nvtop \
-    steam-devices \
-    time \
-    tree
+    podman-compose \
+    steam-devices

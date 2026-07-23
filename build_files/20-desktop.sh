@@ -14,6 +14,7 @@ dnf -y install --setopt=install_weak_deps=False \
     filelight \
     flatpak \
     flatpak-kcm \
+    fuse \
     kate \
     kate-plugins \
     kcm-plasmalogin \
@@ -29,6 +30,7 @@ dnf -y install --setopt=install_weak_deps=False \
     konsole \
     kscreen \
     ksshaskpass \
+    mesa-dri-drivers \
     mesa-vulkan-drivers \
     pam-kwallet \
     pipewire \

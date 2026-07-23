@@ -1,8 +1,0 @@
-[[customizations.user]]
-name = "bootc"
-password = "bootc"
-groups = ["wheel"]
-
-[[customizations.filesystem]]
-mountpoint = "/"
-minsize = "20 GiB"
