@@ -4,6 +4,10 @@ on:
     - cron: '0 6 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 env:
   IMAGE_NAME: leptos
   MAJOR_VERSION: 10
@@ -16,12 +20,11 @@ concurrency:
 
 jobs:
   build_push:
-    name: Build and push image
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
+    name: "Build and push image"
+    runs-on: ubuntu-latest
+    container:
+      image: "ghcr.io/s33po/podman-action"
+      options: "--security-opt=label=disable --privileged --security-opt=seccomp=unconfined --device /dev/fuse:rw --volume /:/run/host:rw"
 
     steps:
       - name: "Checkout"
@@ -29,6 +32,7 @@ jobs:
 
       - name: "Check for updates"
         if: ${{ github.event_name == 'schedule' }}  # Only run if triggered by schedule
+        shell: "bash"
         run: |
           upd=0
           podman run --quiet --rm ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }} dnf check-update || upd=$?
@@ -40,7 +44,19 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
         shell: "bash"
         run: |
-            echo "DATE=$(date -u +%Y%m%d)" >> "$GITHUB_ENV"
+          mkdir -p /github/home/.docker/
+
+      - name: "Build and Rechunk with Chunkah"
+        if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
+        uses: redhat-actions/buildah-build@v2.13
+        with:
+          containerfiles: ./Containerfile
+          oci: true
+          tags: ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
+          extra-args: |
+            --skip-unused-stages=false
+            --security-opt=label=disable
+            --volume /__w/leptos/leptos:/run/src
 
       - name: "GHCR Login"
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
@@ -49,26 +65,18 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+          auth_file_path: "/tmp/auth.json"
 
-      - name: "Build, Rechunk and Push"
+      - name: "Push image"
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
-        uses: jharmison-redhat/action-bootc-build@v1.0.3
+        uses: redhat-actions/push-to-registry@v2.8
+        id: "push"
         with:
-          file: "./Containerfile"
-          tag: ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
-          max-layers: "127"
-          push: "true"
-          labels: |
-            org.opencontainers.image.title=${{ env.IMAGE_NAME }}
-            org.opencontainers.image.version=${{ env.MAJOR_VERSION }}.${{ env.DATE }}
-            org.opencontainers.image.source=${{ env.IMAGE_FULL }}
-            containers.bootc=1
-
-      - name: "Get digest"
-        if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
-        shell: "bash"
-        run: |
-          echo "DIGEST=$(sudo podman image inspect --format '{{.Digest}}' ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }})" >> "$GITHUB_ENV"
+          tags: ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
+          extra-args: |
+            --compression-format=zstd:chunked
+            --compression-level=3
+            --force-compression
 
       - name: "Install Cosign"
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
@@ -79,11 +87,12 @@ jobs:
         shell: "bash"
         env:
           COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
-          IMAGE: ${{ env.IMAGE_FULL }}@${{ env.DIGEST }}
+          DIGEST: ${{ steps.push.outputs.digest }}
+          IMG: ${{ env.IMAGE_FULL }}
         run: |
           set -euo pipefail
           cosign sign --yes \
             --new-bundle-format=false \
             --use-signing-config=false \
             --key env://COSIGN_PRIVATE_KEY \
-            "${IMAGE}"
+            "${IMG}@${DIGEST}"
