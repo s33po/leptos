@@ -52,7 +52,7 @@ jobs:
           extra-args: |
             --skip-unused-stages=false
             --security-opt=label=disable
-            -v "${{ github.workspace }}:/run/src"
+            -v ${{ github.workspace }}:/run/src
 
       - name: "GHCR Login"
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
