@@ -70,7 +70,7 @@ jobs:
           tags: ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
           extra-args: |
             --compression-format=zstd:chunked
-            --compression-level=3
+            --compression-level=19
             --force-compression
 
       - name: "Install Cosign"
