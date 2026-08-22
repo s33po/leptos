@@ -13,5 +13,3 @@ rm -rf /usr/share/backgrounds/f4*
 
 # Remove offline docs
 rm -rf /usr/share/doc
-
-dnf clean all
