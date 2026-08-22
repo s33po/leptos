@@ -14,13 +14,4 @@ rm -rf /usr/share/backgrounds/f4*
 # Remove offline docs
 rm -rf /usr/share/doc
 
-# Prune unnecessary locales
-find /usr/share/locale/* -mindepth 0 -maxdepth 0 \
-    ! -name "en" ! -name "en_US" ! -name "fi" ! -name "fi_FI" ! -name "locale.alias" \
-    -exec rm -rf {} + > /dev/null 2>&1 || true
-
-find /usr/share/qt6/translations/qtwebengine_locales/* -mindepth 0 -maxdepth 0 \
-    ! -name "en-US.pak" ! -name "fi.pak" \
-    -exec rm -rf {} + > /dev/null 2>&1 || true
-
 dnf clean all
