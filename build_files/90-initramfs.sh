@@ -4,7 +4,7 @@ set -xeuo pipefail
 
 # Add plymouth and drm module
 mkdir -p /etc/dracut.conf.d
-echo 'add_dracutmodules+=" drm plymouth "' > /etc/dracut.conf.d/plymouth.conf
+echo 'add_dracutmodules+=" plymouth "' > /etc/dracut.conf.d/plymouth.conf
 
 # Quiet boot
 mkdir -p /usr/lib/bootc/kargs.d
