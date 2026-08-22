@@ -1,7 +1,7 @@
 FROM scratch AS ctx
 COPY build_files /build_files
 
-FROM ghcr.io/s33po/leptos-base:main
+FROM quay.io/almalinuxorg/almalinux-bootc:10
 
 RUN --mount=type=bind,from=ctx,source=/build_files,target=/build_files \
     --mount=type=tmpfs,dst=/boot \
