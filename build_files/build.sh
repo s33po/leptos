@@ -7,7 +7,6 @@ BUILD_SCRIPTS_PATH="$(realpath "$(dirname "$0")")"
 SCRIPTS_TO_RUN=(
   "00-base.sh"
   "20-desktop.sh"
-  "30-extras.sh"
   "40-flatpak.sh"
   "50-conf.sh"
   "60-services.sh"
