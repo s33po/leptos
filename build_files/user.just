@@ -8,12 +8,11 @@ default:
 [group('System')]
 update:
     #!/usr/bin/env bash
+    echo "Updating Flatpaks..."
+    flatpak update -y
 
     echo "Updating system..."
     sudo bootc update
-
-    echo "Updating Flatpaks..."
-    flatpak update -y
 
     echo "System updated!"
 
