@@ -47,6 +47,8 @@ dnf -y install --setopt=install_weak_deps=False \
     qt6-qtimageformats \
     samba-client \
     spectacle \
+    tuned \
+    tuned-ppd \
     upower
 
 systemctl set-default graphical.target
