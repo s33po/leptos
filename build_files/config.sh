@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -xeuo pipefail
+set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$0")"
 
@@ -7,20 +7,15 @@ SCRIPT_DIR="$(dirname "$0")"
 sed -i 's|^ExecStart=.*|ExecStart=/usr/bin/bootc update --quiet|' \
     /usr/lib/systemd/system/bootc-fetch-apply-updates.service
 
-# Set update interval and ensure the timer persist across reboots
+# Set update interval and ensure the timer persists across reboots
 sed -i \
-    -e 's|^OnUnitInactiveSec=.*|OnUnitInactiveSec=3d|' \
-    -e '/^#\?Persistent=/{s||Persistent=true|;b}' \
-    -e '$aPersistent=true' \
+    -e '/^#\?Persistent=/d' \
+    -e 's|^OnUnitInactiveSec=.*|OnUnitInactiveSec=3d\nPersistent=true|' \
     /usr/lib/systemd/system/bootc-fetch-apply-updates.timer
-
-# Set automatic update policy to 'stage'
-sed -i 's|^#\?AutomaticUpdatePolicy=.*|AutomaticUpdatePolicy=stage|' \
-    /etc/rpm-ostreed.conf
 
 # Add Flathub remote and default flatpak list
 mkdir -p /etc/flatpak/remotes.d
-curl --retry 3 -o /etc/flatpak/remotes.d/flathub.flatpakrepo "https://dl.flathub.org/repo/flathub.flatpakrepo"
+curl -fsSL --retry 3 --retry-all-errors -o /etc/flatpak/remotes.d/flathub.flatpakrepo "https://dl.flathub.org/repo/flathub.flatpakrepo"
 install -Dm644 "${SCRIPT_DIR}/defpaks.list" /etc/flatpak/defpaks.list
 
 # Add user.just to image

@@ -8,6 +8,7 @@ default:
 [group('System')]
 update:
     #!/usr/bin/env bash
+    set -euo pipefail
 
     echo "Updating system..."
     sudo bootc update
@@ -21,8 +22,9 @@ update:
 [group('System')]
 update-dbox:
     #!/usr/bin/env bash
+    set -euo pipefail
 
-    containers=$(distrobox list --no-color | tail -n +2 | awk '{print $3}' | grep -v "^$")
+    containers=$(distrobox list --no-color | tail -n +2 | awk 'NF {print $3}')
 
     if [[ -z "$containers" ]]; then
         echo "Nothing to do"
@@ -36,13 +38,13 @@ update-dbox:
 [group('System')]
 clean-system:
     #!/usr/bin/env bash
+    set -euo pipefail
 
     echo "Cleaning Flatpak..."
     flatpak uninstall --unused -y
 
     echo "Cleaning Podman..."
     podman system prune -f
-    podman image prune -f
     podman volume prune -f
 
     echo "Cleaning ostree..."
@@ -57,6 +59,7 @@ clean-system:
 [group('Flatpak')]
 install-flatpaks:
     #!/usr/bin/env bash
+    set -euo pipefail
 
     # Ensure Flathub is available
     flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
