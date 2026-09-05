@@ -1,38 +1,42 @@
 # Package list for build process
 
-# Base system utilities and tools
+# System core packages
 - bash-color-prompt
-- cifs-utils
 - container-tools
 - distrobox
 - git-core
-- lshw
-- make
+- glibc-all-langpacks
 - system-reinstall-bootc
 - systemd-container
-- time
-- toolbox
-- tree
 - usbutils
-- lsof
 - bind-utils
-- vim-enhanced
-- vim-common
 - wget
+- tuned
+- tuned-ppd
+- tuned-profiles-atomic
+- upower
+- mesa-dri-drivers
+- mesa-vulkan-drivers
+- default-fonts-core
+- flatpak
+- pipewire
+- pipewire-pulseaudio
+- plymouth
+- plymouth-system-theme
 
-# Language packs for localization
-- glibc-langpack-en
-- glibc-langpack-fi
+# SMB support
+- cifs-utils
+- samba-client
 
-# KDE Plasma desktop environment and core components
+# Appimage support
+- fuse
+
+# Trimmed KDE Plasma
 - ark
 - breeze-gtk-gtk3
-- default-fonts-core
 - dolphin
 - filelight
-- flatpak
 - flatpak-kcm
-- fuse
 - kate
 - kate-plugins
 - kcm-plasmalogin
@@ -48,10 +52,7 @@
 - konsole
 - kscreen
 - ksshaskpass
-- mesa-dri-drivers
-- mesa-vulkan-drivers
 - pam-kwallet
-- pipewire
 - plasma-desktop
 - plasma-discover
 - plasma-discover-flatpak
@@ -60,22 +61,24 @@
 - plasma-milou
 - plasma-nm
 - plasma-pa
-- plymouth
-- plymouth-system-theme
 - qt6-qtimageformats
-- samba-client
 - spectacle
-- tuned
-- tuned-ppd
-- upower
 
-# Additional utilities and tools
+# Extra command-line utilities and tools
 - bc
 - btop
 - fastfetch
 - fzf
 - gum
 - just
+- lshw
+- lsof
+- make
 - nvtop
 - podman-compose
+- ripgrep
+- time
+- tree
+
+# Support for gaming devices
 - steam-devices

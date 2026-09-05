@@ -69,20 +69,3 @@ install-flatpaks:
 
     xargs -a /etc/flatpak/defpaks.list -r flatpak install -y --noninteractive flathub
     echo "Flatpak installation complete!"
-
-# Install gaming flatpaks
-[group('Flatpak')]
-install-gaming-flatpaks:
-    #!/usr/bin/env bash
-
-    # Ensure Flathub is available
-    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-
-    # Install gaming flatpaks
-    if [[ ! -f /etc/flatpak/gaming.list ]]; then
-        echo "Error: list not found at /etc/flatpak/gaming.list"
-        exit 1
-    fi
-
-    xargs -a /etc/flatpak/gaming.list -r flatpak install -y --noninteractive flathub
-    echo "Gaming Flatpak installation complete!"

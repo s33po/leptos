@@ -3,8 +3,6 @@
 - Custom bootc image for desktop use
 - Built on CentOS Stream 10
 - Trimmed KDE Plasma with a few core apps and basic tools
-- Flatpak for other apps
-- Distrobox for containers
-- Unnecessary firmware, packages and locales removed for a smaller image
+- Targeted package set for specific use case and hardware to keep image size smaller
 
 ### Intended for personal use only
