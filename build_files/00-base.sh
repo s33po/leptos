@@ -2,31 +2,29 @@
 
 set -xeuo pipefail
 
+SCRIPT_DIR="$(dirname "$0")"
+PACKAGES_FILE="${SCRIPT_DIR}/packages.yml"
+
 # Install EPEL and enable CRB
 dnf -y install 'dnf-command(config-manager)' epel-release
 dnf config-manager --set-enabled crb
 dnf -y upgrade epel-release
 
-# Install packages
-dnf -y install --setopt=install_weak_deps=False \
-    bash-color-prompt \
-    cifs-utils \
-    container-tools \
-    distrobox \
-    git-core \
-    lshw \
-    make \
-    system-reinstall-bootc \
-    systemd-container \
-    time \
-    toolbox \
-    tree \
-    usbutils \
-    lsof \
-    bind-utils \
-    vim-enhanced \
-    vim-common \
-    wget
+# Extract and install all packages from packages.yml in a single dnf call
+if [[ ! -f "$PACKAGES_FILE" ]]; then
+    echo "Error: packages.yml not found at $PACKAGES_FILE" >&2
+    exit 1
+fi
+
+echo "Installing packages from packages.yml..."
+packages=$(grep -E '^\s+-\s+' "$PACKAGES_FILE" | sed 's/^\s*-\s*//;s/\s*$//' | tr '\n' ' ')
+
+if [[ -z "$packages" ]]; then
+    echo "Warning: No packages found in packages.yml" >&2
+    exit 1
+fi
+
+dnf -y install --setopt=install_weak_deps=False $packages
 
 # Set quiet bootc updates
 sed -i 's|^ExecStart=.*|ExecStart=/usr/bin/bootc update --quiet|' \
@@ -42,3 +40,6 @@ sed -i \
 # Set automatic update policy to 'stage'
 sed -i 's|^#\?AutomaticUpdatePolicy=.*|AutomaticUpdatePolicy=stage|' \
     /etc/rpm-ostreed.conf
+
+# Set default target to graphical
+systemctl set-default graphical.target
