@@ -9,6 +9,7 @@ env:
   MAJOR_VERSION: 10
   DEFAULT_TAG: ${{ github.ref_name }}
   IMAGE_FULL: ghcr.io/${{ github.repository }}
+  REGISTRY_DOMAIN: "ghcr.io"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -40,6 +41,9 @@ jobs:
         shell: "bash"
         run: |
             echo "DATE=$(date -u +%Y%m%d)" >> "$GITHUB_ENV"
+            sudo mkdir -p /etc/containers/registries.d
+            echo -e "docker:\n  ${{ env.REGISTRY_DOMAIN }}:\n    use-sigstore-attachments: true" \
+              | sudo tee -a /etc/containers/registries.d/${{ env.REGISTRY_DOMAIN }}.yaml
 
       - name: "Build and Rechunk with Chunkah"
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
