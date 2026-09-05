@@ -21,7 +21,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-      id-token: write
 
     steps:
       - name: "Checkout"
@@ -62,32 +61,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "Push image"
+      - name: "Push and sign the image"
         if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
         uses: redhat-actions/push-to-registry@v3.0.0
         id: "push"
         with:
           tags: ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
+          sigstore-private-key: ${{ secrets.SIGNING_SECRET }}
           extra-args: |
             --compression-format=zstd:chunked
             --compression-level=3
             --force-compression
 
-      - name: "Install Cosign"
-        if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
-        uses: sigstore/cosign-installer@v4.1.2
-
-      - name: "Sign image"
-        if: ${{ github.event_name == 'workflow_dispatch' || env.upd != 0 }}
-        shell: "bash"
-        env:
-          COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
-          DIGEST: ${{ steps.push.outputs.digest }}
-          IMG: ${{ env.IMAGE_FULL }}
-        run: |
-          set -euo pipefail
-          cosign sign --yes \
-            --new-bundle-format=false \
-            --use-signing-config=false \
-            --key env://COSIGN_PRIVATE_KEY \
             "${IMG}@${DIGEST}"
