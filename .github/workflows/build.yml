@@ -72,5 +72,3 @@ jobs:
             --compression-format=zstd:chunked
             --compression-level=3
             --force-compression
-
-            "${IMG}@${DIGEST}"
