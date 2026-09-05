@@ -64,11 +64,12 @@ jobs:
           containerfiles: ./Containerfile
           oci: true
           tags: ${{ env.IMAGE_FULL }}:${{ env.DEFAULT_TAG }}
+          build-args: |
+            BASE_IMAGE=${{ env.BASE_IMAGE }}
+            CHUNKAH_CONFIG_STR=${{ env.CHUNKAH_CONFIG_STR }}
           extra-args: |
             --skip-unused-stages=false
             --security-opt=label=disable
-            --build-arg BASE_IMAGE=${{ env.BASE_IMAGE }}
-            --build-arg CHUNKAH_CONFIG_STR=${{ env.CHUNKAH_CONFIG_STR }}
             -v ${{ github.workspace }}:/run/src
 
       - name: "GHCR Login"
