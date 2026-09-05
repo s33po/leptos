@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -xeuo pipefail
+set -euo pipefail
 
 # Add plymouth and drm modules
 mkdir -p /etc/dracut.conf.d

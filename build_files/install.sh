@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
-
-set -xeuo pipefail
+set -euo pipefail
 
 SCRIPT_DIR="$(dirname "$0")"
 PACKAGES_FILE="${SCRIPT_DIR}/packages.yml"
 
-# Install EPEL and enable CRB
-dnf -y install 'dnf-command(config-manager)' epel-release
+# Install config manager, yq, EPEL
+dnf -y install 'dnf-command(config-manager)' epel-release yq
+
+# Enable CRB, required by some EPEL packages
 dnf config-manager --set-enabled crb
+
+# Update the EPEL release package
 dnf -y upgrade epel-release
 
 # Extract and install all packages from packages.yml in a single dnf call
@@ -17,24 +20,18 @@ if [[ ! -f "$PACKAGES_FILE" ]]; then
 fi
 
 mapfile -t packages < <(
-    awk '
-        /^[[:space:]]*-[[:space:]]+/ {
-            sub(/^[[:space:]]*-[[:space:]]+/, "")
-            sub(/[[:space:]]+#.*$/, "")   # Remove optional inline comments
-            sub(/[[:space:]]+$/, "")      # Remove trailing whitespace
-            if ($0 != "") print
-        }
+    yq -r '
+        if type == "!!seq" then
+            .[]
+        else
+            error("expected a top-level YAML list")
+        end
     ' "$PACKAGES_FILE"
 )
 
 if ((${#packages[@]} == 0)); then
-    printf 'Error: No packages found in %s\n' "$PACKAGES_FILE" >&2
+    printf 'Error: no packages found in %s\n' "$PACKAGES_FILE" >&2
     exit 1
 fi
 
-printf 'Installing packages from %s...\n' "$PACKAGES_FILE"
-
-dnf -y \
-    --setopt=install_weak_deps=False \
-    install \
-    "${packages[@]}"
+dnf -y install --setopt=install_weak_deps=False "${packages[@]}"

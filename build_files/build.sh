@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -xeuo pipefail
+set -euo pipefail
 
 BUILD_SCRIPTS_PATH="$(realpath "$(dirname "$0")")"
 
