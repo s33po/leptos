@@ -4,14 +4,12 @@ set -euo pipefail
 SCRIPT_DIR="$(dirname "$0")"
 PACKAGES_FILE="${SCRIPT_DIR}/packages.yml"
 
-# Install config manager, yq, EPEL
-dnf -y install 'dnf-command(config-manager)' epel-release yq
-
-# Enable CRB, required by some EPEL packages
+# Install EPEL and enable CRB
+dnf -y install 'dnf-command(config-manager)' epel-release
 dnf config-manager --set-enabled crb
-
-# Update the EPEL release package
 dnf -y upgrade epel-release
+
+dnf -y install yq
 
 # Extract and install all packages from packages.yml in a single dnf call
 if [[ ! -f "$PACKAGES_FILE" ]]; then
