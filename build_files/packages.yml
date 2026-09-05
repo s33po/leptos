@@ -1,0 +1,84 @@
+# Package list for build process
+
+# System core packages
+- bash-color-prompt
+- container-tools
+- distrobox
+- git-core
+- glibc-all-langpacks
+- system-reinstall-bootc
+- systemd-container
+- usbutils
+- bind-utils
+- wget
+- tuned
+- tuned-ppd
+- tuned-profiles-atomic
+- upower
+- mesa-dri-drivers
+- mesa-vulkan-drivers
+- default-fonts-core
+- flatpak
+- pipewire
+- pipewire-pulseaudio
+- plymouth
+- plymouth-system-theme
+
+# SMB support
+- cifs-utils
+- samba-client
+
+# Appimage support
+- fuse
+
+# Trimmed KDE Plasma
+- ark
+- breeze-gtk-gtk3
+- dolphin
+- filelight
+- flatpak-kcm
+- kate
+- kate-plugins
+- kcm-plasmalogin
+- kde-gtk-config
+- kde-partitionmanager
+- kde-settings-plasmalogin
+- kdegraphics-thumbnailers
+- kdialog
+- kf6-baloo-file
+- kfind
+- kio-admin
+- kjournald
+- konsole
+- kscreen
+- ksshaskpass
+- pam-kwallet
+- plasma-desktop
+- plasma-discover
+- plasma-discover-flatpak
+- plasma-disks
+- plasma-login-manager
+- plasma-milou
+- plasma-nm
+- plasma-pa
+- qt6-qtimageformats
+- spectacle
+
+# Extra command-line utilities and tools
+- bc
+- btop
+- fastfetch
+- fzf
+- gum
+- just
+- lshw
+- lsof
+- make
+- nvtop
+- podman-compose
+- ripgrep
+- time
+- tree
+
+# Support for gaming devices
+- steam-devices

@@ -1,8 +1,8 @@
 IMAGE_NAME ?= localhost/leptos:latest
 REMOTE_IMG ?= ghcr.io/s33po/leptos:main
 
-.PHONY: podman-build
-podman-build:
+.PHONY: build
+build:
 	podman build \
 		--cap-add=all \
 		--security-opt=label=type:disable \
@@ -11,19 +11,8 @@ podman-build:
 		-f ./Containerfile \
 		-t $(IMAGE_NAME) .
 
-.PHONY: buildah-build
-buildah-build:
-	buildah build \
-		--cap-add=all \
-		--security-opt=label=type:disable \
-		--skip-unused-stages=false \
-		--device /dev/fuse \
-		--pull=newer \
-		-f ./Containerfile \
-		-t $(IMAGE_NAME) .
-
-.PHONY: chunkah
-chunkah:
+.PHONY: chunk
+chunk:
 	podman run --rm \
 		"--mount=type=image,src=$(IMAGE_NAME),target=/chunkah" \
 		-e CHUNKAH_CONFIG_STR="$$(podman inspect $(IMAGE_NAME))" \

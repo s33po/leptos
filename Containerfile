@@ -17,7 +17,7 @@ FROM quay.io/coreos/chunkah AS chunkah
 RUN --mount=from=unchunked,src=/,target=/chunkah,ro \
     --mount=type=bind,target=/run/src,rw \
     chunkah build \
-        --max-layers 127 \
+        --max-layers 256 \
         --prune /sysroot/ \
         --label ostree.commit- \
         --label ostree.final-diffid- \
