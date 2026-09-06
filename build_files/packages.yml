@@ -4,13 +4,13 @@
 - bash-color-prompt
 - container-tools
 - distrobox
+- firewalld
 - git-core
 - glibc-all-langpacks
 - system-reinstall-bootc
 - systemd-container
 - usbutils
 - bind-utils
-- wget
 - tuned
 - tuned-ppd
 - tuned-profiles-atomic
@@ -23,6 +23,7 @@
 - pipewire-pulseaudio
 - plymouth
 - plymouth-system-theme
+- rsync
 
 # SMB support
 - cifs-utils
@@ -78,7 +79,11 @@
 - podman-compose
 - ripgrep
 - time
+- tmux
 - tree
+- vim-enhanced
+- vim-common
+- wget
 
 # Support for gaming devices
 - steam-devices
