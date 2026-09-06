@@ -1,5 +1,4 @@
 IMAGE_NAME ?= localhost/leptos:latest
-BASE_IMAGE ?= ghcr.io/s33po/leptos-base:main
 REMOTE_IMG ?= ghcr.io/s33po/leptos:main
 
 .PHONY: build
@@ -10,7 +9,6 @@ build:
 		--device /dev/fuse \
 		--pull=newer \
 		--target unchunked \
-		--build-arg BASE_IMAGE=$(BASE_IMAGE) \
 		-f ./Containerfile \
 		-t $(IMAGE_NAME) .
 
