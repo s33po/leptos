@@ -25,11 +25,16 @@ install -Dm644 "${SCRIPT_DIR}/user.just" /usr/share/just/user.just
 echo "alias jmain='just --justfile /usr/share/just/user.just'" > /etc/profile.d/jmain.sh
 chmod 644 /etc/profile.d/jmain.sh
 
+# Firewalld configuration for discovery services
+firewall-offline-cmd --add-service=mdns
+firewall-offline-cmd --add-service=ws-discovery
+
 # Set default target to graphical
 systemctl set-default graphical.target
 
 # Enable services
 systemctl enable bootc-fetch-apply-updates.timer
+systemctl enable firewalld
 systemctl enable plasmalogin.service
 systemctl enable podman.socket
 systemctl enable tuned.service
